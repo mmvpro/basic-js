@@ -16,50 +16,55 @@ const { NotImplementedError } = require('../extensions/index.js');
 function transform(arr) {
   throw new NotImplementedError('Not implemented');
   // remove line with error and write your code here
-  if (!Array.isArray(arr))
-    throw new Error(`'arr' parameter must be an instance of the Array!`);
   
-    let res = [];
-
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === "--double-prev") {
-      if (Number.isInteger(arr[i - 1])) {
-        res.push(arr[i - 1] * 2);
-        i++;
-      } else i++;
+    if (!Array.isArray(arr)) {
+      throw new Error("'arr' parameter must be an instance of the Array!");
     }
-
-    if (arr[i] === "--discard-prev") {
-      if (Number.isInteger(arr[i - 1])) {
-        i++;
+  
+    const result = [];
+    const controlSequences = ['--discard-next', '--discard-prev', '--double-next', '--double-prev'];
+    let skipNext = false;
+  
+    for (let i = 0; i < arr.length; i++) {
+      const current = arr[i];
+  
+      if (skipNext) {
+        skipNext = false;
+        continue;
       }
-    }
-
-    if (arr[i] === "--double-next") {
-      if (Number.isInteger(arr[i + 1])) {
-        res.push(arr[i - 1]);
-        res.push(arr[i + 1] * 2);
-        i += 2;
-      } else i += 2;
-    }
-
-    if (arr[i] === "--discard-next") {
-      if (Number.isInteger(arr[i + 1])) {
-        res.push(arr[i - 1]);
-        i += 2;
+  
+      if (current === '--discard-next') {
+        skipNext = true;
+        continue;
       }
+  
+      if (current === '--discard-prev') {
+        if (result.length > 0) {
+          result.pop();
+        }
+        continue;
+      }
+  
+      if (current === '--double-next') {
+        if (i + 1 < arr.length) {
+          result.push(arr[i + 1]);
+        }
+        continue;
+      }
+  
+      if (current === '--double-prev') {
+        if (i - 1 >= 0) {
+          result.push(arr[i - 1]);
+        }
+        continue;
+      }
+  
+      result.push(current);
     }
-
-    if (
-      Number.isInteger(arr[i]) &&
-      typeof arr[i + 1] !== "string" &&
-      typeof arr[i - 1]
-    ) {
-      res.push(arr[i]);
-    }
-  }
-
-  return res;
+  
+    return result;
+  
+  
 }
 
 module.exports = {
