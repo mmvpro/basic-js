@@ -14,59 +14,59 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 function transform(arr) {
-  throw new NotImplementedError('Not implemented');
+  // throw new NotImplementedError('Not implemented');
   // remove line with error and write your code here
   
-    if (!Array.isArray(arr)) {
-      throw new Error("'arr' parameter must be an instance of the Array!");
-    }
-  
-    const result = [];
-    const controlSequences = ['--discard-next', '--discard-prev', '--double-next', '--double-prev'];
-    let skipNext = false;
-  
-    for (let i = 0; i < arr.length; i++) {
-      const current = arr[i];
-  
-      if (skipNext) {
-        skipNext = false;
-        continue;
-      }
-  
-      if (current === '--discard-next') {
-        skipNext = true;
-        continue;
-      }
-  
-      if (current === '--discard-prev') {
-        if (result.length > 0) {
-          result.pop();
-        }
-        continue;
-      }
-  
-      if (current === '--double-next') {
-        if (i + 1 < arr.length) {
-          result.push(arr[i + 1]);
-        }
-        continue;
-      }
-  
-      if (current === '--double-prev') {
-        if (i - 1 >= 0) {
-          result.push(arr[i - 1]);
-        }
-        continue;
-      }
-  
-      result.push(current);
-    }
-  
-    return result;
-  
-  
-}
 
+  if (!Array.isArray(arr)) {
+    throw Error("'arr' parameter must be an instance of the Array!");
+  }
+  
+  if (!arr instanceof Array) {
+    throw Error('Not an array');
+  }
+
+  let  transformedArray = [];
+
+  for (let i = 0; i < arr.length; i++) {
+    switch (arr[i]) {
+      case '--discard-next': {
+        i++;
+
+        break;
+      }
+
+      case '--discard-prev': {
+        if (arr[i - 2] !== '--discard-next') {
+          transformedArray.pop();
+        }
+
+        break;
+      }
+
+      case '--double-next': {
+        if (arr[i + 1] !== undefined) {
+         transformedArray.push(arr[i + 1]);
+        }
+
+        break;
+      }
+
+      case '--double-prev': {
+        if (arr[i - 2] !== '--discard-next' && arr[i - 1] !== undefined) {
+           transformedArray.push(arr[i - 1]);
+        }
+
+        break;
+      }
+
+      default:
+         transformedArray.push(arr[i]);
+    }
+  }
+
+  return transformedArray;
+} 
 module.exports = {
   transform
 };
