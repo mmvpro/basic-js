@@ -20,20 +20,72 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  
+  constructor(isDirect = true) {
+    this.isDirect = isDirect;
+    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    this.square = this.generateSquare();
+  }
 
-  
-  
+  generateSquare() {
+    const a = this.alphabet;
+    let sq = [];
+    for (let i = 0; i < a.length; i++) {
+      sq[i] = a.slice(i).concat(a.slice(0, i));
+    }
+
+    return sq;
+  }
+
   encrypt(message, key) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+    return this.crypt(message, key, true);
   }
-  decrypt(message, key) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
-        
 
+  decrypt(message, key) {
+    return this.crypt(message, key, false);
   }
+
+  crypt(message, key, encrypt) {
+    if (!message || !key) {
+      throw Error('Incorrect arguments!');
+    }
+
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+
+    while (key.length < message.length) {
+      key += key;
+    }
+
+    let result = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < message.length; i++) {
+      if (message[i] !== ' ' && this.alphabet.includes(message[i])) {
+        if (encrypt) {
+          result +=
+            this.square[this.alphabet.indexOf(message[i])][
+            this.alphabet.indexOf(key[keyIndex])
+            ];
+        } else {
+          result +=
+            this.alphabet[
+            this.square[this.alphabet.indexOf(key[keyIndex])].indexOf(
+              message[i]
+            )
+            ];
+        }
+        keyIndex++;
+      } else {
+        result += message[i];
+      }
+    }
+
+    if (!this.isDirect) {
+      return result.split('').reverse().join('');
+    }
+
+    return result;
+  } 
 }
 
 module.exports = {
